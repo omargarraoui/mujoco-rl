@@ -1,0 +1,48 @@
+# Default configuration
+
+# Environment
+env:
+  task: pick_place
+  frame_skip: 5
+  image_size: [224, 224]
+  max_episode_steps: 500
+
+# Policy
+policy:
+  type: mlp  # mlp or rnn
+  vision_encoder: simple  # simple or vit
+  hidden_dim: 256
+  num_layers: 3
+
+# Training (BC)
+bc:
+  epochs: 50
+  batch_size: 64
+  learning_rate: 3e-4
+  num_expert_episodes: 100
+  save_freq: 10
+
+# Training (RL)
+rl:
+  algo: ppo  # ppo or sac
+  num_envs: 4
+  total_timesteps: 1000000
+  learning_rate: 3e-4
+  gamma: 0.99
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 10
+
+# Evaluation
+eval:
+  episodes: 50
+  max_steps: 500
+  render: true
+  seed: 0
+
+# Logging
+logging:
+  tensorboard: true
+  log_dir: runs
+  checkpoint_dir: checkpoints
+  video_dir: videos

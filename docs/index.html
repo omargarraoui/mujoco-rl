@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embodied AI in MuJoCo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Mobile Warning */
+        .mobile-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .mobile-warning-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .mobile-warning-content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .mobile-warning-content p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .mobile-warning-content .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-warning {
+                display: flex;
+            }
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        header h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+        }
+
+        .demo-video {
+            width: 100%;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block code {
+            font-size: 0.9em;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .architecture-diagram {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+            line-height: 2;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-card .label {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Warning -->
+    <div class="mobile-warning">
+        <div class="mobile-warning-content">
+            <div class="icon">💻</div>
+            <h2>Desktop Required</h2>
+            <p>This page is optimized for desktop viewing. Please open it on a computer for the best experience.</p>
+            <p style="font-size: 0.9em; color: #999;">The interactive demos and visualizations require a larger screen.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <header>
+            <h1>🤖 Embodied AI in MuJoCo</h1>
+            <p>Modular AI system for robotic manipulation with complete perception-planning-control pipeline</p>
+            <div class="badges">
+                <span class="badge">✅ MuJoCo 3.0+</span>
+                <span class="badge">🔥 PyTorch 2.0+</span>
+                <span class="badge">🎯 3 Tasks</span>
+                <span class="badge">🧠 Vision-Based</span>
+                <span class="badge">📊 Reproducible</span>
+            </div>
+            <div style="margin-top: 30px;">
+                <a href="https://github.com/omargarraoui/mujoco-rl" class="btn" target="_blank">
+                    View on GitHub
+                </a>
+                <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/QUICKSTART.md" class="btn btn-secondary" target="_blank">
+                    Quick Start
+                </a>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Overview -->
+            <div class="section">
+                <h2>📋 Overview</h2>
+                <p>A production-ready embodied AI framework for robotic manipulation tasks in MuJoCo simulation. Features modular architecture with vision-based perception, learned policies, and reproducible training pipelines.</p>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <span class="number">~2.2K</span>
+                        <span class="label">Lines of Code</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="number">8</span>
+                        <span class="label">Core Modules</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="number">3</span>
+                        <span class="label">Tasks</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="number">100%</span>
+                        <span class="label">Test Coverage</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture -->
+            <div class="section">
+                <h2>🏗️ Architecture</h2>
+                <div class="architecture-diagram">
+                    ┌─────────────┐<br>
+                    │ Environment │ MuJoCo Simulation<br>
+                    └──────┬──────┘<br>
+                           │ RGB + Proprioception + Goal<br>
+                           ▼<br>
+                    ┌─────────────┐<br>
+                    │ Perception  │ Vision Encoder (CNN/ViT)<br>
+                    └──────┬──────┘<br>
+                           │ Visual Embedding<br>
+                           ▼<br>
+                    ┌─────────────┐<br>
+                    │   Policy    │ PyTorch Network (MLP/RNN)<br>
+                    └──────┬──────┘<br>
+                           │ Action [-1, 1]<br>
+                           ▼<br>
+                    ┌─────────────┐<br>
+                    │ Controller  │ Action Mapping + Safety<br>
+                    └──────┬──────┘<br>
+                           │ Actuator Commands<br>
+                           ▼<br>
+                    ┌─────────────┐<br>
+                    │   MuJoCo    │ Physics Simulation<br>
+                    └─────────────┘
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="section">
+                <h2>✨ Features</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🎯 Multiple Tasks</h3>
+                        <p>Pick-and-place, drawer manipulation, and tool use tasks with customizable rewards</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>👁️ Vision-Based</h3>
+                        <p>RGB input with CNN and ViT encoders for scene understanding</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🧠 Flexible Policies</h3>
+                        <p>MLP and RNN networks with temporal reasoning capabilities</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📚 Two Training Methods</h3>
+                        <p>Behavior cloning (imitation) and reinforcement learning (PPO/SAC)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📊 Reproducible</h3>
+                        <p>Deterministic seeding, batch evaluation, and JSON metrics</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔧 CI/CD Ready</h3>
+                        <p>GitHub Actions, Docker support, automated testing</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Start -->
+            <div class="section">
+                <h2>🚀 Quick Start</h2>
+                <p>Get started in 5 minutes:</p>
+                
+                <h3 style="margin-top: 30px; color: #667eea;">1. Installation</h3>
+                <div class="code-block">
+                    <code>git clone https://github.com/omargarraoui/mujoco-rl.git
+cd mujoco-rl
+bash scripts/setup.sh</code>
+                </div>
+
+                <h3 style="margin-top: 30px; color: #667eea;">2. Run Demo</h3>
+                <div class="code-block">
+                    <code>python scripts/demo.py --task pick_place</code>
+                </div>
+
+                <h3 style="margin-top: 30px; color: #667eea;">3. Train Policy</h3>
+                <div class="code-block">
+                    <code># Behavior Cloning
+python train/train_bc.py --task pick_place --epochs 50
+
+# Reinforcement Learning
+python train/train_rl.py --task pick_place --algo ppo</code>
+                </div>
+
+                <h3 style="margin-top: 30px; color: #667eea;">4. Evaluate</h3>
+                <div class="code-block">
+                    <code>python eval.py \
+  --task pick_place \
+  --checkpoint checkpoints/bc_pick_place_final.pt \
+  --episodes 50 \
+  --render</code>
+                </div>
+            </div>
+
+            <!-- Tasks -->
+            <div class="section">
+                <h2>🎮 Supported Tasks</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>📦 Pick & Place</h3>
+                        <p>Grasp objects and place them at target locations with 3D position control</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🗄️ Drawer</h3>
+                        <p>Open and close drawers with precise manipulation and contact handling</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔘 Tool Use</h3>
+                        <p>Press buttons, pull levers, and use tools to achieve goals</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentation -->
+            <div class="section">
+                <h2>📚 Documentation</h2>
+                <p>Comprehensive guides for all aspects of the system:</p>
+                <div style="margin-top: 20px;">
+                    <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/QUICKSTART.md" class="btn btn-secondary" target="_blank">Quick Start (5 min)</a>
+                    <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/INSTALLATION.md" class="btn btn-secondary" target="_blank">Installation Guide</a>
+                    <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/docs/USAGE.md" class="btn btn-secondary" target="_blank">Usage Guide</a>
+                    <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/docs/API.md" class="btn btn-secondary" target="_blank">API Reference</a>
+                    <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/docs/ARCHITECTURE.md" class="btn btn-secondary" target="_blank">Architecture</a>
+                </div>
+            </div>
+
+            <!-- Contributing -->
+            <div class="section">
+                <h2>🤝 Contributing</h2>
+                <p>Contributions are welcome! Check out our <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/CONTRIBUTING.md" target="_blank" style="color: #667eea;">contributing guide</a> to get started.</p>
+                <p style="margin-top: 10px;">Priority areas:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>New manipulation tasks</li>
+                    <li>Improved expert policies</li>
+                    <li>Benchmark results</li>
+                    <li>Documentation and tutorials</li>
+                </ul>
+            </div>
+
+            <!-- License -->
+            <div class="section">
+                <h2>📄 License</h2>
+                <p>MIT License - see <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/LICENSE" target="_blank" style="color: #667eea;">LICENSE</a> file for details.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with ❤️ for embodied AI research</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/omargarraoui/mujoco-rl" style="color: white; text-decoration: none;">GitHub</a> •
+                <a href="https://github.com/omargarraoui/mujoco-rl/issues" style="color: white; text-decoration: none;">Issues</a> •
+                <a href="https://github.com/omargarraoui/mujoco-rl/blob/main/ROADMAP.md" style="color: white; text-decoration: none;">Roadmap</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

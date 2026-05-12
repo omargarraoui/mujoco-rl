@@ -1,0 +1,56 @@
+# Example experiment configuration
+
+experiment:
+  name: "pick_place_bc_baseline"
+  seed: 42
+  device: "cuda"  # or "cpu"
+
+# Environment
+env:
+  task: "pick_place"
+  frame_skip: 5
+  image_size: [224, 224]
+  max_episode_steps: 500
+
+# Policy
+policy:
+  type: "mlp"  # mlp or rnn
+  vision_encoder: "simple"  # simple or vit
+  hidden_dim: 256
+  num_layers: 3
+
+# Training (Behavior Cloning)
+training:
+  method: "bc"  # bc or rl
+  epochs: 100
+  batch_size: 128
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  
+  # Expert data
+  num_expert_episodes: 200
+  expert_data_path: "data/expert_pick_place.pt"
+  
+  # Checkpointing
+  save_freq: 10
+  checkpoint_dir: "checkpoints/pick_place_bc"
+  
+  # Logging
+  log_freq: 10
+  tensorboard_dir: "runs/pick_place_bc"
+
+# Evaluation
+evaluation:
+  episodes: 100
+  max_steps: 500
+  render: false
+  save_videos: false
+  video_freq: 10  # Save video every N episodes
+  results_dir: "results/pick_place_bc"
+
+# Data augmentation (optional)
+augmentation:
+  enabled: false
+  random_crop: true
+  color_jitter: true
+  random_flip: false
