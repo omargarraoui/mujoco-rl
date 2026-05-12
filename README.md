@@ -1,13 +1,12 @@
 # Embodied AI in MuJoCo
 
 [![CI](https://github.com/omargarraoui/mujoco-rl/workflows/CI/badge.svg)](https://github.com/omargarraoui/mujoco-rl/actions)
-[![Deploy Pages](https://github.com/omargarraoui/mujoco-rl/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/omargarraoui/mujoco-rl/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
 Sistema modulare di embodied AI per task di manipolazione fisica in simulazione MuJoCo con pipeline completa **perception → planning → policy → control**.
 
-🌐 **[View Interactive Demo](https://omargarraoui.github.io/mujoco-rl/)** | 📚 **[Documentation](https://github.com/omargarraoui/mujoco-rl/tree/main/docs)** | 🚀 **[Quick Start](QUICKSTART.md)** | 🎯 **[START HERE](START_HERE.md)**
+📚 **[Documentation](https://github.com/omargarraoui/mujoco-rl/tree/main/docs)** | 🚀 **[Quick Start](QUICKSTART.md)** | 🎯 **[START HERE](START_HERE.md)**
 
 ## Features
 
@@ -173,11 +172,9 @@ embodied_ai_mujoco/
 │   ├── test_rollout.py
 │   └── verify_install.py
 ├── tests/              # Unit tests
-├── docs/               # Documentation + GitHub Pages
-│   └── index.html      # Interactive demo page
-└── .github/workflows/  # CI/CD configuration
-    ├── ci.yml          # Testing pipeline
-    └── deploy-pages.yml # GitHub Pages deployment
+├── docs/               # Documentation
+└── .github/workflows/  # CI configuration
+    └── ci.yml          # Testing pipeline
 ```
 
 ## CI/CD
